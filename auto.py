@@ -57,8 +57,8 @@ class Auto:
           print("API request failed!")
 
     def beginprocess(self):
-        self.Load_whisper();
-        self.Load_NLLB();
+        #self.Load_whisper();
+        #self.Load_NLLB();
         self.GetAllVideoList();
 
 
