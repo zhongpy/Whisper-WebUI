@@ -55,7 +55,7 @@ class Auto:
           print("API request failed!")
 
     def GetVideoEpisodes(self,vid):
-        url = "https://dyhaojiu.jaxczs.cn/api/video/getVideoEpisode?vid={vid}"
+        url = "https://dyhaojiu.jaxczs.cn/api/video/getVideoEpisode?vid="+str(vid)
         response = requests.get(url)
         if response.status_code == 200:
             # Get the data in JSON format
