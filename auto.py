@@ -11,6 +11,7 @@ from modules.whisper_data_class import *
 class Auto:
     def __init__(self, args):
         self.args = args
+        self.videoLists=None
         self.whisper_inf = ConsoleWhisperInference() if self.args.disable_faster_whisper else ConsoleFasterWhisperInference()
         if isinstance(self.whisper_inf, ConsoleWhisperInference):
             print("Use Faster Whisper implementation")
@@ -46,8 +47,20 @@ class Auto:
         response = requests.get(url)
         if response.status_code == 200:
             # Get the data in JSON format
-            data = response.json()
-            print(data)
+            self.videoLists = response.json()
+            print(self.videoLists)
+            for videoinfo in self.videoLists:
+                self.GetVideoEpisodes(videoinfo['id'])
+        else:
+          print("API request failed!")
+
+    def GetVideoEpisodes(self,vid):
+        url = "https://dyhaojiu.jaxczs.cn/api/video/getVideoEpisode?vid="+vid
+        response = requests.get(url)
+        if response.status_code == 200:
+            # Get the data in JSON format
+            episodes = response.json()
+            print(episodes)
         else:
           print("API request failed!")
 
@@ -55,6 +68,7 @@ class Auto:
         #self.Load_whisper();
         #self.Load_NLLB();
         self.GetAllVideoList();
+
 
 
 # Create the parser for command-line arguments
