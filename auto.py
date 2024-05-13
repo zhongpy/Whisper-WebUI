@@ -2,7 +2,7 @@ import os
 import argparse
 import requests
 
-from modules.whisper_Inference_console import ConsoleWhisperInference
+from modules.whisper_inference_console import ConsoleWhisperInference
 from modules.faster_whisper_inference_console import ConsoleFasterWhisperInference
 from modules.nllb_inference_console import ConsoleNLLBInference
 from modules.whisper_data_class import *
