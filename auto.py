@@ -99,7 +99,7 @@ class Auto:
             return {}
 
 
-    def TranscribeVideo(self,folder_path,file_name,save_name):
+    def TranscribeVideo(self,rootfolder,lanfolder,file_name,save_name):
         whisper_params=WhisperValues(
             model_size=self.whisper_model,
             lang="Automatic Detection",
@@ -113,7 +113,7 @@ class Auto:
             condition_on_previous_text=true,
             initial_prompt=None
             )
-        self.whisper_inf.transcribe_file(folder_path,save_name,file_name,"SRT",False,*whisper_params)
+        self.whisper_inf.transcribe_file(rootfolder,lanfolder,save_name,file_name,"SRT",False,*whisper_params)
 
     def GetAllVideoList(self):
         url = "https://dyhaojiu.jaxczs.cn/api/video/getAllVideoList"
