@@ -143,20 +143,21 @@ class Auto:
                     self.process_info[self.whisper_model]['zh_hans']={}
                 if not epid in self.process_info[self.whisper_model]['zh_hans'] or self.process_info[self.whisper_model]['zh_hans'][epid]==0:
                     self.process_info[self.whisper_model]['zh_hans'][epid]=0
-                    result_str, result_file_path=self.TranscribeVideo("subtitle/"+self.whisper_model,"zh_hans",epurl,str(epid))
-                    print(result_str)
-                    print(result_file_path)
-                    self.process_info[self.whisper_model]['zh_hans'][epid]=1
+                    if self.TranscribeVideo("subtitle/"+self.whisper_model,"zh_hans",epurl,str(epid)):
+                        self.process_info[self.whisper_model]['zh_hans'][epid]=1
+                    else:
+                        print("Transcribe Failed:Videoid:"+str(vid)+" epid:"+str(epid))
                 for lankey,lanvalue in self.translate_languages:
                     lankey_file="subtitle/"+self.whisper_model+"/"+lankey_file+"/"+str(epid)+".srt"
                     if not lankey in self.process_info[self.whisper_model]:
                         self.process_info[self.whisper_model][lankey]={}
                     if not epid in self.process_info[self.whisper_model][lankey] or self.process_info[self.whisper_model][lankey][epid]==0:
                         self.process_info[self.whisper_model][lankey][epid]=0
-                        gr_str, output_path=self.nllb_inf.translate_file("subtitle/"+self.whisper_model,lankey,zh_hansfile,self.NLLB_model,"Chinese (Simplified)",lanvalue,False)
-                        print(gr_str)
-                        print(output_path)
-                        self.process_info[self.whisper_model][lankey][epid]=1
+                        if self.nllb_inf.translate_file("subtitle/"+self.whisper_model,lankey,zh_hansfile,self.NLLB_model,"Chinese (Simplified)",lanvalue,False):
+                            self.process_info[self.whisper_model][lankey][epid]=1
+                        else:
+                            print("Translate Failed:Videoid:"+str(vid)+" epid:"+str(epid)+" lan:"+lanvalue)
+                        
             self.save_dict_to_txt(self.process_info,"autoprocess","processinfo.txt")
         else:
           print("API request failed!")

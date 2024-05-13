@@ -63,8 +63,7 @@ class ConsoleFasterWhisperInference(BaseInterface):
         result_file_path:
             Output file path to return to gr.Files()
         """
-        #try:
-        if True:
+        try:
             file_info = {}
             if True:
                 transcribed_segments, time_for_task = self.transcribe(
@@ -92,16 +91,16 @@ class ConsoleFasterWhisperInference(BaseInterface):
                     total_result += f'{file_info["subtitle"]}'
                     total_time += file_info["time_for_task"]
 
-                result_str = f"Done in {self.format_time(total_time)}! Subtitle is in the outputs folder.\n\n{total_result}"
-                result_file_path = file_info['path']
+                print(f"Done in {self.format_time(total_time)}! Subtitle is in the outputs folder.\n\n{total_result}")
+                print(file_info['path'])
+                return True
 
-                return [result_str, result_file_path]
-
-        #except Exception as e:
-            #print(f"Error transcribing file: {e}")
-        #finally:
-            #self.release_cuda_memory()
-            #self.remove_input_files([file])
+        except Exception as e:
+            print(f"Error transcribing file: {e}")
+        finally:
+            self.release_cuda_memory()
+            self.remove_input_files([file])
+            return False
 
     def transcribe(self,
                    audio: Union[str, BinaryIO, np.ndarray],

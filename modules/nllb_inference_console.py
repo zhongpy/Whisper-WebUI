@@ -125,13 +125,15 @@ class ConsoleNLLBInference(BaseInterface):
                     total_result += f'{file_name}\n\n'
                     total_result += f'{subtitle}'
 
-                gr_str = f"Done! Subtitle is in the outputs/translation folder.\n\n{total_result}"
-                return [gr_str, output_path]
+                print(f"Done! Subtitle is in the outputs/translation folder.\n\n{total_result}")
+                print(output_path)
+                return True
         except Exception as e:
             print(f"Error: {str(e)}")
         finally:
             self.release_cuda_memory()
             self.remove_input_files([fileobj])
+            return False
 
 
 NLLB_AVAILABLE_LANGS = {
