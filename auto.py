@@ -147,7 +147,7 @@ class Auto:
                         self.process_info[self.whisper_model]['zh_hans'][epid]=1
                     else:
                         print("Transcribe Failed:Videoid:"+str(vid)+" epid:"+str(epid))
-                for lankey,lanvalue in self.translate_languages:
+                for lankey,lanvalue in self.translate_languages.items():
                     lankey_file="subtitle/"+self.whisper_model+"/"+lankey+"/"+str(epid)+".srt"
                     if not lankey in self.process_info[self.whisper_model]:
                         self.process_info[self.whisper_model][lankey]={}
