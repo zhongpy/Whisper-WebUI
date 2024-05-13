@@ -44,7 +44,7 @@ class ConsoleNLLBInference(BaseInterface):
                        model_size: str,
                        src_lang: str,
                        tgt_lang: str,
-                       add_timestamp: bool) -> list:
+                       add_timestamp: bool)->bool:
         """
         Translate subtitle file from source language to target language
 

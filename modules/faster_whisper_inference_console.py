@@ -41,7 +41,7 @@ class ConsoleFasterWhisperInference(BaseInterface):
                         file_format: str,
                         add_timestamp: bool,
                         whisper_params
-                        ) -> list:
+                        )->bool:
         """
         Write subtitle file from Files
 
