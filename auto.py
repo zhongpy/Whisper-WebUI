@@ -136,24 +136,24 @@ class Auto:
             for episodeinfo in episodes:
                 epid=episodeinfo['id']
                 epurl=episodeinfo['videourl']
-                zh_hansfile=self.whisper_model+"/zh_hans/"+str(epid)+".srt"
+                zh_hansfile="subtitle/"+self.whisper_model+"/zh_hans/"+str(epid)+".srt"
                 if not self.whisper_model in self.process_info:
                     self.process_info[self.whisper_model]={}
                 if not 'zh_hans' in self.process_info[self.whisper_model]:
                     self.process_info[self.whisper_model]['zh_hans']={}
                 if not epid in self.process_info[self.whisper_model]['zh_hans'] or self.process_info[self.whisper_model]['zh_hans'][epid]==0:
                     self.process_info[self.whisper_model]['zh_hans'][epid]=0
-                    result_str, result_file_path=self.TranscribeVideo(self.whisper_model,"zh_hans",epurl,str(epid))
+                    result_str, result_file_path=self.TranscribeVideo("subtitle/"+self.whisper_model,"zh_hans",epurl,str(epid))
                     print(result_str)
                     print(result_file_path)
                     self.process_info[self.whisper_model]['zh_hans'][epid]=1
                 for lankey,lanvalue in self.translate_languages:
-                    lankey_file=self.whisper_model+"/"+lankey_file+"/"+str(epid)+".srt"
+                    lankey_file="subtitle/"+self.whisper_model+"/"+lankey_file+"/"+str(epid)+".srt"
                     if not lankey in self.process_info[self.whisper_model]:
                         self.process_info[self.whisper_model][lankey]={}
                     if not epid in self.process_info[self.whisper_model][lankey] or self.process_info[self.whisper_model][lankey][epid]==0:
                         self.process_info[self.whisper_model][lankey][epid]=0
-                        gr_str, output_path=self.nllb_inf.translate_file(self.whisper_model,lankey,zh_hansfile,self.NLLB_model,"Chinese (Simplified)",lanvalue,False)
+                        gr_str, output_path=self.nllb_inf.translate_file("subtitle/"+self.whisper_model,lankey,zh_hansfile,self.NLLB_model,"Chinese (Simplified)",lanvalue,False)
                         print(gr_str)
                         print(output_path)
                         self.process_info[self.whisper_model][lankey][epid]=1
