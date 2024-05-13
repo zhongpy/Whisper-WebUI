@@ -18,6 +18,10 @@ def timeformat_vtt(time):
 
 
 def write_file(subtitle, output_file):
+    folder_path = os.path.dirname(output_file)
+
+    # 创建目录（如果不存在）
+    os.makedirs(folder_path, exist_ok=True)
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(subtitle)
 
