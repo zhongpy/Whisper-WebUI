@@ -12,7 +12,7 @@ class Auto:
     def __init__(self, args):
         self.args = args
         self.whisper_inf = ConsoleWhisperInference() if self.args.disable_faster_whisper else ConsoleFasterWhisperInference()
-        if isinstance(self.whisper_inf, FasterWhisperInference):
+        if isinstance(self.whisper_inf, ConsoleWhisperInference):
             print("Use Faster Whisper implementation")
         else:
             print("Use Open AI Whisper implementation")
