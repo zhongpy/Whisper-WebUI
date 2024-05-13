@@ -113,7 +113,7 @@ class Auto:
             condition_on_previous_text=True,
             initial_prompt=None
             )
-        self.whisper_inf.transcribe_file(rootfolder,lanfolder,save_name,file_name,"SRT",False,whisper_params)
+        return self.whisper_inf.transcribe_file(rootfolder,lanfolder,save_name,file_name,"SRT",False,whisper_params)
 
     def GetAllVideoList(self):
         url = "https://dyhaojiu.jaxczs.cn/api/video/getAllVideoList"
