@@ -89,8 +89,8 @@ class ConsoleFasterWhisperInference(BaseInterface):
                 if True:
                     total_result += '------------------------------------\n'
                     total_result += f'{file_name}\n\n'
-                    total_result += f'{info["subtitle"]}'
-                    total_time += info["time_for_task"]
+                    total_result += f'{file_info["subtitle"]}'
+                    total_time += file_info["time_for_task"]
 
                 result_str = f"Done in {self.format_time(total_time)}! Subtitle is in the outputs folder.\n\n{total_result}"
                 result_file_path = file_info['path']
