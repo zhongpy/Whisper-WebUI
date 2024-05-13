@@ -12,10 +12,14 @@ from modules.whisper_data_class import *
 class Auto:
     def __init__(self, args):
         self.args = args
+        self.whisper_model="medium"
+        self.device="cuda"
+        self.NLLB_model="facebook/nllb-200-1.3B"
         self.videoLists=None
         self.whisper_inf=None
         self.nllb_inf=None
         self.process_info={}
+        self.translate_languages={"en":"English","ja":"Japanese","zh_hant":"Chinese (Traditional)","ko":"Korean","vi":"Vietnamese","tha":"Thai","ind":"Indonesian","hi":"Hindi","ar":"Modern Standard Arabic","de":"German","fr":"French","it":"Italian","ru":"Russian","es":"Spanish","zsm":"Standard Malay"}
         
 
     def Load_whisper(self):
@@ -26,12 +30,12 @@ class Auto:
             else:
                 print("Use Open AI Whisper implementation")
             print(f"Device \"{self.whisper_inf.device}\" is detected")
-        self.whisper_inf.update_model(self.args.whisper_model,"cuda")
+        self.whisper_inf.update_model(self.whisper_model,self.device)
 
     def Load_NLLB(self):
         if self.nllb_inf==None:
             self.nllb_inf = ConsoleNLLBInference()
-        self.nllb_inf.update_model(self.args.NLLB_model)
+        self.nllb_inf.update_model(self.NLLB_model)
 
     def save_dict_to_txt(self,data, folder_path, file_name):
         """
@@ -94,9 +98,9 @@ class Auto:
             return {}
 
 
-    def TranscribeVideo(self,file_name):
+    def TranscribeVideo(self,folder_path,file_name,save_name):
         whisper_params=WhisperValues(
-            model_size=self.args.whisper_model,
+            model_size=self.whisper_model,
             lang="Automatic Detection",
             is_translate=False,
             beam_size=1,
@@ -108,7 +112,7 @@ class Auto:
             condition_on_previous_text=true,
             initial_prompt=None
             )
-        self.whisper_inf.transcribe_file(file_name,"SRT",False,*whisper_params)
+        self.whisper_inf.transcribe_file(folder_path,save_name,file_name,"SRT",False,*whisper_params)
 
     def GetAllVideoList(self):
         url = "https://dyhaojiu.jaxczs.cn/api/video/getAllVideoList"
@@ -131,15 +135,34 @@ class Auto:
             for episodeinfo in episodes:
                 epid=episodeinfo['id']
                 epurl=episodeinfo['videourl']
-
+                zh_hansfile=self.whisper_model+"/zh_hans/"+str(epid)+".srt"
+                if not self.whisper_model in self.process_info:
+                    self.process_info[self.whisper_model]={}
+                if not 'zh_hans' in self.process_info[self.whisper_model]:
+                    self.process_info[self.whisper_model]['zh_hans']={}
+                if not epid in self.process_info[self.whisper_model]['zh_hans'] or self.process_info[self.whisper_model]['zh_hans'][epid]==0:
+                    self.process_info[self.whisper_model]['zh_hans'][epid]=0
+                    result_str, result_file_path=self.TranscribeVideo(self.whisper_model,"zh_hans",epurl,str(epid))
+                    print(result_str)
+                    print(result_file_path)
+                    self.process_info[self.whisper_model]['zh_hans'][epid]=1
+                for lankey,lanvalue in self.translate_languages:
+                    lankey_file=self.whisper_model+"/"+lankey_file+"/"+str(epid)+".srt"
+                    if not lankey in self.process_info[self.whisper_model]:
+                        self.process_info[self.whisper_model][lankey]={}
+                    if not epid in self.process_info[self.whisper_model][lankey] or self.process_info[self.whisper_model][lankey][epid]==0:
+                        self.process_info[self.whisper_model][lankey][epid]=0
+                        gr_str, output_path=self.nllb_inf.translate_file(self.whisper_model,lankey,zh_hansfile,self.NLLB_model,"Chinese (Simplified)",lanvalue,False)
+                        print(gr_str)
+                        print(output_path)
+                        self.process_info[self.whisper_model][lankey][epid]=1
+            self.save_dict_to_txt(self.process_info,"autoprocess","processinfo.txt")
         else:
           print("API request failed!")
 
     def beginprocess(self):
-        #self.Load_whisper();
-        #self.Load_NLLB();
-        self.process_info={1:"aa",2:"bb",3:{"cc":3,"bb":4}}
-        self.save_dict_to_txt(self.process_info,"./autoprocess","processinfo.txt")
+        self.Load_whisper();
+        self.Load_NLLB();
         self.process_info=self.load_dict_from_txt('./autoprocess/processinfo.txt')
         self.GetAllVideoList();
 
@@ -148,9 +171,6 @@ class Auto:
 # Create the parser for command-line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--disable_faster_whisper', type=bool, default=False, nargs='?', const=True, help='Disable the faster_whisper implementation. faster_whipser is implemented by https://github.com/guillaumekln/faster-whisper')
-parser.add_argument('--whisper_model', type=str, default='medium', help='Whisper Model')
-parser.add_argument('--NLLB_model', type=str, default='facebook/nllb-200-1.3B', help='NLLB Model')
-parser.add_argument('--folder', type=str, default=None, help='folder')
 _args = parser.parse_args()
 
 if __name__ == "__main__":

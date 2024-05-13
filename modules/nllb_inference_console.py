@@ -38,7 +38,9 @@ class ConsoleNLLBInference(BaseInterface):
                                                                cache_dir=os.path.join("models", "NLLB", "tokenizers"))
 
     def translate_file(self,
-                       fileobjs: list,
+                       rootfolder:str,
+                       lanfolder:str,
+                       fileobj: str,
                        model_size: str,
                        src_lang: str,
                        tgt_lang: str,
@@ -79,8 +81,7 @@ class ConsoleNLLBInference(BaseInterface):
                                      tgt_lang=tgt_lang,
                                      device=self.device)
 
-            files_info = {}
-            for fileobj in fileobjs:
+            if True:
                 file_path = fileobj.name
                 file_name, file_ext = os.path.splitext(os.path.basename(fileobj.name))
                 if file_ext == ".srt":
@@ -93,9 +94,9 @@ class ConsoleNLLBInference(BaseInterface):
 
                     timestamp = datetime.now().strftime("%m%d%H%M%S")
                     if add_timestamp:
-                        output_path = os.path.join("outputs", "translations", f"{file_name}-{timestamp}")
+                        output_path = os.path.join(rootfolder, lanfolder, f"{file_name}-{timestamp}")
                     else:
-                        output_path = os.path.join("outputs", "translations", f"{file_name}")
+                        output_path = os.path.join(rootfolder, lanfolder, f"{file_name}")
                     output_path += '.srt'
 
                     write_file(subtitle, output_path)
@@ -110,28 +111,27 @@ class ConsoleNLLBInference(BaseInterface):
 
                     timestamp = datetime.now().strftime("%m%d%H%M%S")
                     if add_timestamp:
-                        output_path = os.path.join("outputs", "translations", f"{file_name}-{timestamp}")
+                        output_path = os.path.join(rootfolder, lanfolder, f"{file_name}-{timestamp}")
                     else:
-                        output_path = os.path.join("outputs", "translations", f"{file_name}")
+                        output_path = os.path.join(rootfolder, lanfolder, f"{file_name}")
                     output_path += '.vtt'
 
                     write_file(subtitle, output_path)
 
-                files_info[file_name] = subtitle
 
-            total_result = ''
-            for file_name, subtitle in files_info.items():
-                total_result += '------------------------------------\n'
-                total_result += f'{file_name}\n\n'
-                total_result += f'{subtitle}'
+                total_result = ''
+                if True:
+                    total_result += '------------------------------------\n'
+                    total_result += f'{file_name}\n\n'
+                    total_result += f'{subtitle}'
 
-            gr_str = f"Done! Subtitle is in the outputs/translation folder.\n\n{total_result}"
-            return [gr_str, output_path]
+                gr_str = f"Done! Subtitle is in the outputs/translation folder.\n\n{total_result}"
+                return [gr_str, output_path]
         except Exception as e:
             print(f"Error: {str(e)}")
         finally:
             self.release_cuda_memory()
-            self.remove_input_files([fileobj.name for fileobj in fileobjs])
+            self.remove_input_files([fileobj])
 
 
 NLLB_AVAILABLE_LANGS = {

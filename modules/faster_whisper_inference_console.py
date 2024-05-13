@@ -34,7 +34,10 @@ class ConsoleFasterWhisperInference(BaseInterface):
         self.default_beam_size = 1
 
     def transcribe_file(self,
-                        files: list,
+                        rootfolder:str,
+                        lanfolder:str,
+                        save_file:str,
+                        file: str,
                         file_format: str,
                         add_timestamp: bool,
                         *whisper_params
@@ -44,8 +47,8 @@ class ConsoleFasterWhisperInference(BaseInterface):
 
         Parameters
         ----------
-        files: list
-            List of files to transcribe from gr.Files()
+        file: str
+            List of file to transcribe from gr.Files()
         file_format: str
             Subtitle File format to write from gr.Dropdown(). Supported format: [SRT, WebVTT, txt]
         add_timestamp: bool
@@ -61,42 +64,43 @@ class ConsoleFasterWhisperInference(BaseInterface):
             Output file path to return to gr.Files()
         """
         try:
-            files_info = {}
-            for file in files:
+            file_info = {}
+            if True:
                 transcribed_segments, time_for_task = self.transcribe(
-                    file.name,
+                    file,
                     *whisper_params,
                 )
 
-                file_name, file_ext = os.path.splitext(os.path.basename(file.name))
+                file_name, file_ext = os.path.splitext(os.path.basename(file))
                 file_name = safe_filename(file_name)
                 subtitle, file_path = self.generate_and_write_file(
-                    file_name=file_name,
+                    rootfolder=rootfolder,
+                    lanfolder=lanfolder,
+                    file_name=save_file,
                     transcribed_segments=transcribed_segments,
                     add_timestamp=add_timestamp,
                     file_format=file_format
                 )
-                files_info[file_name] = {"subtitle": subtitle, "time_for_task": time_for_task, "path": file_path}
+                file_info = {"subtitle": subtitle, "time_for_task": time_for_task, "path": file_path}
 
-            total_result = ''
-            total_time = 0
-            for file_name, info in files_info.items():
-                total_result += '------------------------------------\n'
-                total_result += f'{file_name}\n\n'
-                total_result += f'{info["subtitle"]}'
-                total_time += info["time_for_task"]
+                total_result = ''
+                total_time = 0
+                if True:
+                    total_result += '------------------------------------\n'
+                    total_result += f'{file_name}\n\n'
+                    total_result += f'{info["subtitle"]}'
+                    total_time += info["time_for_task"]
 
-            result_str = f"Done in {self.format_time(total_time)}! Subtitle is in the outputs folder.\n\n{total_result}"
-            result_file_path = [info['path'] for info in files_info.values()]
+                result_str = f"Done in {self.format_time(total_time)}! Subtitle is in the outputs folder.\n\n{total_result}"
+                result_file_path = file_info['path']
 
-            return [result_str, result_file_path]
+                return [result_str, result_file_path]
 
         except Exception as e:
             print(f"Error transcribing file: {e}")
         finally:
             self.release_cuda_memory()
-            if not files:
-                self.remove_input_files([file.name for file in files])
+            self.remove_input_files([file])
 
     def transcribe(self,
                    audio: Union[str, BinaryIO, np.ndarray],
@@ -179,7 +183,9 @@ class ConsoleFasterWhisperInference(BaseInterface):
         )
 
     @staticmethod
-    def generate_and_write_file(file_name: str,
+    def generate_and_write_file(rootfolder:str,
+                                lanfolder:str,
+                                file_name: str,
                                 transcribed_segments: list,
                                 add_timestamp: bool,
                                 file_format: str
@@ -207,9 +213,9 @@ class ConsoleFasterWhisperInference(BaseInterface):
         """
         timestamp = datetime.now().strftime("%m%d%H%M%S")
         if add_timestamp:
-            output_path = os.path.join("outputs", f"{file_name}-{timestamp}")
+            output_path = os.path.join(rootfolder,lanfolder, f"{file_name}-{timestamp}")
         else:
-            output_path = os.path.join("outputs", f"{file_name}")
+            output_path = os.path.join(rootfolder,lanfolder, f"{file_name}")
 
         if file_format == "SRT":
             content = get_srt(transcribed_segments)
