@@ -72,8 +72,6 @@ class ConsoleFasterWhisperInference(BaseInterface):
                     whisper_params,
                 )
 
-                file_name, file_ext = os.path.splitext(os.path.basename(file))
-                file_name = safe_filename(file_name)
                 subtitle, file_path = self.generate_and_write_file(
                     rootfolder=rootfolder,
                     lanfolder=lanfolder,
@@ -88,7 +86,7 @@ class ConsoleFasterWhisperInference(BaseInterface):
                 total_time = 0
                 if True:
                     total_result += '------------------------------------\n'
-                    total_result += f'{file_name}\n\n'
+                    total_result += f'{save_file}\n\n'
                     total_result += f'{file_info["subtitle"]}'
                     total_time += file_info["time_for_task"]
 
