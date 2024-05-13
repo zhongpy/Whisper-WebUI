@@ -11,7 +11,7 @@ DEFAULT_MODEL_SIZE = "facebook/nllb-200-1.3B"
 NLLB_MODELS = ["facebook/nllb-200-3.3B", "facebook/nllb-200-1.3B", "facebook/nllb-200-distilled-600M"]
 
 
-class NLLBInference(BaseInterface):
+class ConsoleNLLBInference(BaseInterface):
     def __init__(self):
         super().__init__()
         self.default_model_size = DEFAULT_MODEL_SIZE

@@ -2,11 +2,9 @@ import os
 import argparse
 import requests
 
-from modules.whisper_Inference import WhisperInference
-from modules.faster_whisper_inference import FasterWhisperInference
-from modules.nllb_inference import NLLBInference
-from ui.htmls import *
-from modules.youtube_manager import get_ytmetas
+from modules.whisper_Inference_console import ConsoleWhisperInference
+from modules.faster_whisper_inference_console import ConsoleFasterWhisperInference
+from modules.nllb_inference_console import ConsoleNLLBInference
 from modules.whisper_data_class import *
 
 
@@ -19,7 +17,7 @@ class Auto:
         else:
             print("Use Open AI Whisper implementation")
         print(f"Device \"{self.whisper_inf.device}\" is detected")
-        self.nllb_inf = NLLBInference()
+        self.nllb_inf = ConsoleNLLBInference()
 
     def Load_whisper(self):
         self.whisper_inf.update_model(self.args.whisper_model,"cuda")
