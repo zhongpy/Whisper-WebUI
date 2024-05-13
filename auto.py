@@ -12,13 +12,13 @@ class Auto:
     def __init__(self, args):
         self.args = args
         self.videoLists=None
-        self.whisper_inf = ConsoleWhisperInference() if self.args.disable_faster_whisper else ConsoleFasterWhisperInference()
-        if isinstance(self.whisper_inf, ConsoleWhisperInference):
-            print("Use Faster Whisper implementation")
-        else:
-            print("Use Open AI Whisper implementation")
-        print(f"Device \"{self.whisper_inf.device}\" is detected")
-        self.nllb_inf = ConsoleNLLBInference()
+        #self.whisper_inf = ConsoleWhisperInference() if self.args.disable_faster_whisper else ConsoleFasterWhisperInference()
+        #if isinstance(self.whisper_inf, ConsoleWhisperInference):
+        #    print("Use Faster Whisper implementation")
+        #else:
+        #    print("Use Open AI Whisper implementation")
+        #print(f"Device \"{self.whisper_inf.device}\" is detected")
+        #self.nllb_inf = ConsoleNLLBInference()
 
     def Load_whisper(self):
         self.whisper_inf.update_model(self.args.whisper_model,"cuda")
@@ -55,7 +55,7 @@ class Auto:
           print("API request failed!")
 
     def GetVideoEpisodes(self,vid):
-        url = "https://dyhaojiu.jaxczs.cn/api/video/getVideoEpisode?vid="+vid
+        url = "https://dyhaojiu.jaxczs.cn/api/video/getVideoEpisode?vid={vid}"
         response = requests.get(url)
         if response.status_code == 200:
             # Get the data in JSON format
