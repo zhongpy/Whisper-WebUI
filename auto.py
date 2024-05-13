@@ -157,8 +157,7 @@ class Auto:
                             self.process_info[self.whisper_model][lankey][epid]=1
                         else:
                             print("Translate Failed:Videoid:"+str(vid)+" epid:"+str(epid)+" lan:"+lanvalue)
-                        
-            self.save_dict_to_txt(self.process_info,"autoprocess","processinfo.txt")
+                self.save_dict_to_txt(self.process_info,"autoprocess","processinfo.txt")
         else:
           print("API request failed!")
 
