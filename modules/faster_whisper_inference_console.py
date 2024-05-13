@@ -64,7 +64,7 @@ class ConsoleFasterWhisperInference(BaseInterface):
             Output file path to return to gr.Files()
         """
         #try:
-
+        if True:
             file_info = {}
             if True:
                 transcribed_segments, time_for_task = self.transcribe(
