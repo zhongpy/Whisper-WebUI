@@ -14,6 +14,7 @@ class Auto:
         self.args = args
         self.whisper_model="medium"
         self.device="cuda"
+        self.compute_type="float16"
         self.NLLB_model="facebook/nllb-200-1.3B"
         self.videoLists=None
         self.whisper_inf=None
@@ -30,7 +31,7 @@ class Auto:
             else:
                 print("Use Open AI Whisper implementation")
             print(f"Device \"{self.whisper_inf.device}\" is detected")
-        self.whisper_inf.update_model(self.whisper_model,self.device)
+        self.whisper_inf.update_model(self.whisper_model,self.compute_type)
 
     def Load_NLLB(self):
         if self.nllb_inf==None:
@@ -106,7 +107,7 @@ class Auto:
             beam_size=1,
             log_prob_threshold=-1,
             no_speech_threshold=0.6,
-            compute_type="float16",
+            compute_type=self.compute_type,
             best_of=5,
             patience=1,
             condition_on_previous_text=true,
