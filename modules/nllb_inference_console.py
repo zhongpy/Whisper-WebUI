@@ -83,8 +83,8 @@ class ConsoleNLLBInference(BaseInterface):
                                      device=self.device)
 
             if True:
-                file_path = fileobj.name
-                file_name, file_ext = os.path.splitext(os.path.basename(fileobj.name))
+                file_path = fileobj
+                file_name, file_ext = os.path.splitext(os.path.basename(fileobj))
                 if file_ext == ".srt":
                     parsed_dicts = parse_srt(file_path=file_path)
                     total_progress = len(parsed_dicts)
