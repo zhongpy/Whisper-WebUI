@@ -40,7 +40,7 @@ class ConsoleFasterWhisperInference(BaseInterface):
                         file: str,
                         file_format: str,
                         add_timestamp: bool,
-                        *whisper_params
+                        whisper_params
                         ) -> list:
         """
         Write subtitle file from Files
@@ -68,7 +68,7 @@ class ConsoleFasterWhisperInference(BaseInterface):
             if True:
                 transcribed_segments, time_for_task = self.transcribe(
                     file,
-                    *whisper_params,
+                    whisper_params,
                 )
 
                 file_name, file_ext = os.path.splitext(os.path.basename(file))
@@ -104,7 +104,7 @@ class ConsoleFasterWhisperInference(BaseInterface):
 
     def transcribe(self,
                    audio: Union[str, BinaryIO, np.ndarray],
-                   *whisper_params
+                   whisper_params
                    ) -> Tuple[List[dict], float]:
         """
         transcribe method for faster-whisper.
@@ -125,7 +125,7 @@ class ConsoleFasterWhisperInference(BaseInterface):
         """
         start_time = time.time()
 
-        params = WhisperValues(*whisper_params)
+        params = whisper_params
 
         if params.model_size != self.current_model_size or self.model is None or self.current_compute_type != params.compute_type:
             self.update_model(params.model_size, params.compute_type)
