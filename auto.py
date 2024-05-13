@@ -47,10 +47,7 @@ class Auto:
         if response.status_code == 200:
             # Get the data in JSON format
             data = response.json()
-            if data.code==1:
-                print(data)
-            else:
-                print("API request failed!")
+            print(data)
         else:
           print("API request failed!")
 
