@@ -137,6 +137,8 @@ class Auto:
             for episodeinfo in episodes:
                 epid=episodeinfo['id']
                 epurl=episodeinfo['videourl']
+                if epurl=="":
+                    continue
                 epidkey=str(epid)
                 zh_hansfile="subtitle/"+self.whisper_model+"/zh_hans/"+str(epid)+".srt"
                 if not self.whisper_model in self.process_info:
