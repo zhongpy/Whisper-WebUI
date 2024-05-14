@@ -23,6 +23,8 @@ class ConsoleNLLBInference(BaseInterface):
         self.available_target_langs = list(NLLB_AVAILABLE_LANGS.keys())
         self.device = 0 if torch.cuda.is_available() else -1
         self.pipeline = None
+        self.src_lang = ""
+        self.tgt_lang = ""
 
     def translate_text(self, text):
         result = self.pipeline(text)
@@ -74,13 +76,15 @@ class ConsoleNLLBInference(BaseInterface):
 
             src_lang = NLLB_AVAILABLE_LANGS[src_lang]
             tgt_lang = NLLB_AVAILABLE_LANGS[tgt_lang]
-
-            self.pipeline = pipeline("translation",
-                                     model=self.model,
-                                     tokenizer=self.tokenizer,
-                                     src_lang=src_lang,
-                                     tgt_lang=tgt_lang,
-                                     device=self.device)
+            if self.pipeline==None or self.src_lang!=src_lang or self.tgt_lang!=tgt_lang:
+                self.src_lang=src_lang
+                self.tgt_lang=tgt_lang
+                self.pipeline = pipeline("translation",
+                                         model=self.model,
+                                         tokenizer=self.tokenizer,
+                                         src_lang=src_lang,
+                                         tgt_lang=tgt_lang,
+                                         device=self.device)
 
             if True:
                 file_path = fileobj

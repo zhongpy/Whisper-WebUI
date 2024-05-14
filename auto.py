@@ -111,7 +111,7 @@ class Auto:
             compute_type=self.compute_type,
             best_of=5,
             patience=1,
-            condition_on_previous_text=True,
+            condition_on_previous_text=False,
             initial_prompt=None
             )
         return self.whisper_inf.transcribe_file(rootfolder,lanfolder,save_name,file_name,"SRT",False,whisper_params)
