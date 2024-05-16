@@ -70,8 +70,8 @@ class ConsoleNLLBInference(BaseInterface):
         String to return to gr.Textbox()
         Files to return to gr.Files()
         """
-        #try:
-        if True:
+        try:
+        #if True:
             self.update_model(model_size)
 
             src_lang = NLLB_AVAILABLE_LANGS[src_lang]
@@ -130,15 +130,15 @@ class ConsoleNLLBInference(BaseInterface):
                     total_result += f'{file_name}\n\n'
                     total_result += f'{subtitle}'
 
-                print(f"Done! Subtitle is in the outputs/translation folder.\n\n{total_result}")
+                #print(f"Done! Subtitle is in the outputs/translation folder.\n\n{total_result}")
                 print(output_path)
                 return True
-        #except Exception as e:
-         #   print(f"Error: {str(e)}")
-        #finally:
-         #   self.release_cuda_memory()
+        except Exception as e:
+            print(f"Error: {str(e)}")
+        finally:
+        #    self.release_cuda_memory()
         #    self.remove_input_files([fileobj])
-         #   return False
+            return False
 
 
 NLLB_AVAILABLE_LANGS = {
