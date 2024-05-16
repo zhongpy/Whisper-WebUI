@@ -135,7 +135,7 @@ class ConsoleNLLBInference(BaseInterface):
                 return True
         except Exception as e:
             print(f"Error: {str(e)}")
-        finally:
+        #finally:
         #    self.release_cuda_memory()
         #    self.remove_input_files([fileobj])
             return False

@@ -96,7 +96,7 @@ class ConsoleFasterWhisperInference(BaseInterface):
         #return False
         except Exception as e:
             print(f"Error transcribing file: {e}")
-        finally:
+        #finally:
         #    self.release_cuda_memory()
         #    self.remove_input_files([file])
             return False
