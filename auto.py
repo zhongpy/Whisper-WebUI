@@ -12,10 +12,10 @@ from modules.whisper_data_class import *
 class Auto:
     def __init__(self, args):
         self.args = args
-        self.whisper_model="medium"
+        self.whisper_model="large-v3"
         self.device="cuda"
         self.compute_type="float16"
-        self.NLLB_model="facebook/nllb-200-1.3B"
+        self.NLLB_model="facebook/nllb-200-3.3B"
         self.videoLists=None
         self.whisper_inf=None
         self.nllb_inf=None
