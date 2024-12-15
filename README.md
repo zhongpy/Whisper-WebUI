@@ -7,6 +7,10 @@ A Gradio-based browser interface for [Whisper](https://github.com/openai/whisper
 If you wish to try this on Colab, you can do it in [here](https://colab.research.google.com/github/jhj0517/Whisper-WebUI/blob/master/notebook/whisper-webui.ipynb)!
 
 # Feature
+- Select the Whisper implementation you want to use between :
+   - [openai/whisper](https://github.com/openai/whisper)
+   - [SYSTRAN/faster-whisper](https://github.com/SYSTRAN/faster-whisper) (used by default)
+   - [Vaibhavs10/insanely-fast-whisper](https://github.com/Vaibhavs10/insanely-fast-whisper)
 - Generate subtitles from various sources, including :
   - Files
   - Youtube
@@ -20,59 +24,73 @@ If you wish to try this on Colab, you can do it in [here](https://colab.research
 - Text to Text Translation
   - Translate subtitle files using Facebook NLLB models
   - Translate subtitle files using DeepL API
+- Pre-processing audio input with [Silero VAD](https://github.com/snakers4/silero-vad).
+- Pre-processing audio input to separate BGM with [UVR](https://github.com/Anjok07/ultimatevocalremovergui). 
+- Post-processing with speaker diarization using the [pyannote](https://huggingface.co/pyannote/speaker-diarization-3.1) model.
+   - To download the pyannote model, you need to have a Huggingface token and manually accept their terms in the pages below.
+      1. https://huggingface.co/pyannote/speaker-diarization-3.1
+      2. https://huggingface.co/pyannote/segmentation-3.0
 
 # Installation and Running
-- ## On Windows OS
+
+- ## Running with Pinokio
+
+The app is able to run with [Pinokio](https://github.com/pinokiocomputer/pinokio).
+
+1. Install [Pinokio Software](https://program.pinokio.computer/#/?id=install).
+2. Open the software and search for Whisper-WebUI and install it.
+3. Start the Whisper-WebUI and connect to the `http://localhost:7860`.
+
+- ## Running with Docker 
+
+1. Install and launch [Docker-Desktop](https://www.docker.com/products/docker-desktop/).
+
+2. Git clone the repository
+
+```sh
+git clone https://github.com/jhj0517/Whisper-WebUI.git
+```
+
+3. Build the image ( Image is about 7GB~ )
+
+```sh
+docker compose build 
+```
+
+4. Run the container 
+
+```sh
+docker compose up
+```
+
+5. Connect to the WebUI with your browser at `http://localhost:7860`
+
+If needed, update the [`docker-compose.yaml`](https://github.com/jhj0517/Whisper-WebUI/blob/master/docker-compose.yaml) to match your environment.
+
+- ## Run Locally
+
 ### Prerequisite
-To run this WebUI, you need to have `git`, `python` version 3.8 ~ 3.10, `CUDA` version above 12.0 and `FFmpeg`.
+To run this WebUI, you need to have `git`, `3.10 <= python <= 3.12`, `FFmpeg`. <br>
+And if you're not using an Nvida GPU, or using a different `CUDA` version than 12.4,  edit the [`requirements.txt`](https://github.com/jhj0517/Whisper-WebUI/blob/master/requirements.txt) to match your environment.
 
 Please follow the links below to install the necessary software:
-- CUDA : [https://developer.nvidia.com/cuda-downloads](https://developer.nvidia.com/cuda-downloads)
 - git : [https://git-scm.com/downloads](https://git-scm.com/downloads)
-- python : [https://www.python.org/downloads/](https://www.python.org/downloads/) **( If your python version is too new, torch will not install properly.)**
+- python : [https://www.python.org/downloads/](https://www.python.org/downloads/) **`3.10 ~ 3.12` is recommended.** 
 - FFmpeg :  [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html)
+- CUDA : [https://developer.nvidia.com/cuda-downloads](https://developer.nvidia.com/cuda-downloads)
 
 After installing FFmpeg, **make sure to add the `FFmpeg/bin` folder to your system PATH!**
 
 ### Automatic Installation
-If you have satisfied the prerequisites listed above, you are now ready to start Whisper-WebUI.
 
-1. Run `Install.bat` from Windows Explorer as a regular, non-administrator user. 
-2. After installation, run the `start-webui.bat`. 
-3. Open your web browser and go to `http://localhost:7860`
-
-( If you're running another Web-UI, it will be hosted on a different port , such as `localhost:7861`, `localhost:7862`, and so on )
-
-And you can also run the project with command line arguments if you like by running `user-start-webui.bat`, see [wiki](https://github.com/jhj0517/Whisper-WebUI/wiki/Command-Line-Arguments) for a guide to arguments.
-
-- ## Docker ( On Other OS )
-
-1. Build the image
-
-```sh
-docker build -t whisper-webui:latest . 
-```
-
-2. Run the container with commands
-
-- For bash :
-```sh
-docker run --gpus all -d \
--v /path/to/models:/Whisper-WebUI/models \
--v /path/to/outputs:/Whisper-WebUI/outputs \
--p 7860:7860 \
--it \
-whisper-webui:latest --server_name 0.0.0.0 --server_port 7860
-```
-- For PowerShell:
+1. git clone this repository
 ```shell
-docker run --gpus all -d `
--v /path/to/models:/Whisper-WebUI/models `
--v /path/to/outputs:/Whisper-WebUI/outputs `
--p 7860:7860 `
--it `
-whisper-webui:latest --server_name 0.0.0.0 --server_port 7860
+git clone https://github.com/jhj0517/Whisper-WebUI.git
 ```
+2. Run `install.bat` or `install.sh` to install dependencies. (It will create a `venv` directory and install dependencies there.)
+3. Start WebUI with `start-webui.bat` or `start-webui.sh` (It will run `python app.py` after activating the venv)
+
+And you can also run the project with command line arguments if you like to, see [wiki](https://github.com/jhj0517/Whisper-WebUI/wiki/Command-Line-Arguments) for a guide to arguments.
 
 # VRAM Usages
 This project is integrated with [faster-whisper](https://github.com/guillaumekln/faster-whisper) by default for better VRAM usage and transcription speed.
@@ -83,7 +101,8 @@ According to faster-whisper, the efficiency of the optimized whisper model is as
 | openai/whisper    | fp16      | 5         | 4m30s | 11325MB         | 9439MB          |
 | faster-whisper    | fp16      | 5         | 54s   | 4755MB          | 3244MB          |
 
-If you want to use the original Open AI whisper implementation instead of optimized whisper, you can set the command line argument `--disable_faster_whisper` to `True`. See the [wiki](https://github.com/jhj0517/Whisper-WebUI/wiki/Command-Line-Arguments) for more information.
+If you want to use an implementation other than faster-whisper, use `--whisper_type` arg and the repository name.<br>
+Read [wiki](https://github.com/jhj0517/Whisper-WebUI/wiki/Command-Line-Arguments) for more info about CLI args.
 
 ## Available models
 This is Whisper's original VRAM usage table for models.
@@ -99,3 +118,16 @@ This is Whisper's original VRAM usage table for models.
 
 `.en` models are for English only, and the cool thing is that you can use the `Translate to English` option from the "large" models!
 
+## TODO🗓
+
+- [x] Add DeepL API translation
+- [x] Add NLLB Model translation
+- [x] Integrate with faster-whisper
+- [x] Integrate with insanely-fast-whisper
+- [x] Integrate with whisperX ( Only speaker diarization part )
+- [x] Add background music separation pre-processing with [UVR](https://github.com/Anjok07/ultimatevocalremovergui)  
+- [ ] Add fast api script
+- [ ] Support real-time transcription for microphone
+
+### Translation 🌐
+Any PRs that translate the language into [translation.yaml](https://github.com/jhj0517/Whisper-WebUI/blob/master/configs/translation.yaml) would be greatly appreciated!
