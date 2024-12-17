@@ -199,18 +199,18 @@ class TranslationBase(ABC):
                     add_timestamp=add_timestamp
                 )
 
-                files_info[file_name] = {"subtitle": subtitle, "path": file_path}
+                file_info = {"subtitle": subtitle, "path": file_path}
 
-            total_result = ''
-            for file_name, info in files_info.items():
-                total_result += '------------------------------------\n'
-                total_result += f'{file_name}\n\n'
-                total_result += f'{info["subtitle"]}'
-            gr_str = f"Done! Subtitle is in the outputs/translation folder.\n\n{total_result}"
+                total_result = ''
+                if True:
+                    total_result += '------------------------------------\n'
+                    total_result += f'{file_name}\n\n'
+                    total_result += f'{file_info["subtitle"]}'
+                gr_str = f"Done! Subtitle is in the outputs/translation folder.\n\n{total_result}"
 
-            output_file_paths = [item["path"] for key, item in files_info.items()]
-            print(gr_str);
-            return True;
+                #output_file_paths = [item["path"] for key, item in files_info.items()]
+                print(file_info['path'])
+                return True;
 
         except Exception as e:
             print(f"Error translating file: {e}")
