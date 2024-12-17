@@ -264,6 +264,83 @@ class BaseTranscriptionPipeline(ABC):
         finally:
             self.release_cuda_memory()
 
+    def transcribe_file_web(self,
+                        rootfolder:str,
+                        lanfolder:str,
+                        save_file:str,
+                        file: str,
+                        file_format: str,
+                        add_timestamp: bool,
+                        progress=gr.Progress(),
+                        *pipeline_params,
+                        )->bool:
+        """
+        Write subtitle file from web
+
+        Parameters
+        ----------
+        file: str
+            List of file to transcribe from gr.Files()
+        file_format: str
+            Subtitle File format to write from gr.Dropdown(). Supported format: [SRT, WebVTT, txt]
+        add_timestamp: bool
+            Boolean value from gr.Checkbox() that determines whether to add a timestamp at the end of the subtitle filename.
+        *whisper_params: tuple
+            Gradio components related to Whisper. see whisper_data_class.py for details.
+
+        Returns
+        ----------
+        result_str:
+            Result of transcription to return to gr.Textbox()
+        result_file_path:
+            Output file path to return to gr.Files()
+        """
+        try:
+        #if True:
+            file_info = {}
+            if True:
+                transcribed_segments, time_for_task = self.run(
+                    file,
+                    progress,
+                    file_format,
+                    add_timestamp,
+                    *pipeline_params,
+                )
+
+                out_dir=output_dir+'/'+lanfolder;
+
+                writer_options = {
+                    "highlight_words": True if params.whisper.word_timestamps else False
+                }
+                subtitle, file_path = self.generate_file(
+                    output_dir=out_dir,
+                    output_file_name=save_file,
+                    output_format=file_format,
+                    result=transcribed_segments,
+                    add_timestamp=add_timestamp,
+                    **writer_options
+                )
+                file_info = {"subtitle": subtitle, "time_for_task": time_for_task, "path": file_path}
+
+                total_result = ''
+                total_time = 0
+                if True:
+                    total_result += '------------------------------------\n'
+                    total_result += f'{save_file}\n\n'
+                    total_result += f'{file_info["subtitle"]}'
+                    total_time += file_info["time_for_task"]
+
+                #print(f"Done in {self.format_time(total_time)}! Subtitle is in the outputs folder.\n\n{total_result}")
+                print(file_info['path'])
+                return True
+        #return False
+        except Exception as e:
+            print(f"Error transcribing file: {e}")
+        #finally:
+        #    self.release_cuda_memory()
+        #    self.remove_input_files([file])
+            return False
+
     def transcribe_mic(self,
                        mic_audio: str,
                        file_format: str = "SRT",

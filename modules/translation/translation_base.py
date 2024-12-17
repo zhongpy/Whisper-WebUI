@@ -129,6 +129,99 @@ class TranslationBase(ABC):
         finally:
             self.release_cuda_memory()
 
+    def translate_file_web(self,
+                       rootfolder:str,
+                       lanfolder:str,
+                       fileobj: str,
+                       model_size: str,
+                       src_lang: str,
+                       tgt_lang: str,
+                       max_length: int = 200,
+                       add_timestamp: bool = True,
+                       progress=gr.Progress()) -> list:
+        """
+        Translate subtitle file from source language to target language
+
+        Parameters
+        ----------
+        fileobjs: list
+            List of files to transcribe from gr.Files()
+        model_size: str
+            Whisper model size from gr.Dropdown()
+        src_lang: str
+            Source language of the file to translate from gr.Dropdown()
+        tgt_lang: str
+            Target language of the file to translate from gr.Dropdown()
+        max_length: int
+            Max length per line to translate
+        add_timestamp: bool
+            Boolean value from gr.Checkbox() that determines whether to add a timestamp at the end of the filename.
+        progress: gr.Progress
+            Indicator to show progress directly in gradio.
+            I use a forked version of whisper for this. To see more info : https://github.com/jhj0517/jhj0517-whisper/tree/add-progress-callback
+
+        Returns
+        ----------
+        A List of
+        String to return to gr.Textbox()
+        Files to return to gr.Files()
+        """
+        try:
+            if fileobjs and isinstance(fileobjs[0], gr.utils.NamedString):
+                fileobjs = [file.name for file in fileobjs]
+
+            self.cache_parameters(model_size=model_size,
+                                  src_lang=src_lang,
+                                  tgt_lang=tgt_lang,
+                                  max_length=max_length,
+                                  add_timestamp=add_timestamp)
+
+            self.update_model(model_size=model_size,
+                              src_lang=src_lang,
+                              tgt_lang=tgt_lang,
+                              progress=progress)
+
+            files_info = {}
+            if True:
+
+                file_name, file_ext = os.path.splitext(os.path.basename(fileobj))
+                writer = get_writer(file_ext, self.output_dir)
+                segments = writer.to_segments(fileobj)
+                for i, segment in enumerate(segments):
+                    progress(i / len(segments), desc="Translating..")
+                    translated_text = self.translate(segment.text, max_length=max_length)
+                    segment.text = translated_text
+                timestamp = datetime.now().strftime("%m%d%H%M%S")
+                output_path = os.path.join(rootfolder, lanfolder)
+
+                subtitle, file_path = generate_file(
+                    output_dir=output_path,
+                    output_file_name=file_name,
+                    output_format=file_ext,
+                    result=segments,
+                    add_timestamp=add_timestamp
+                )
+
+                files_info[file_name] = {"subtitle": subtitle, "path": file_path}
+
+            total_result = ''
+            for file_name, info in files_info.items():
+                total_result += '------------------------------------\n'
+                total_result += f'{file_name}\n\n'
+                total_result += f'{info["subtitle"]}'
+            gr_str = f"Done! Subtitle is in the outputs/translation folder.\n\n{total_result}"
+
+            output_file_paths = [item["path"] for key, item in files_info.items()]
+            print(gr_str);
+            return True;
+
+        except Exception as e:
+            print(f"Error translating file: {e}")
+            raise
+        #finally:
+        #    self.release_cuda_memory()
+        return False
+
     def offload(self):
         """Offload the model and free up the memory"""
         if self.model is not None:

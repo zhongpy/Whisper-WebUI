@@ -1,42 +1,52 @@
 import os
 import argparse
-import requests
-import json
+import yaml
 
-from modules.whisper_inference_console import ConsoleWhisperInference
-from modules.faster_whisper_inference_console import ConsoleFasterWhisperInference
-from modules.nllb_inference_console import ConsoleNLLBInference
-from modules.whisper_data_class import *
+from modules.utils.paths import (FASTER_WHISPER_MODELS_DIR, DIARIZATION_MODELS_DIR, OUTPUT_DIR, WHISPER_MODELS_DIR,
+                                 INSANELY_FAST_WHISPER_MODELS_DIR, NLLB_MODELS_DIR, DEFAULT_PARAMETERS_CONFIG_PATH,
+                                 UVR_MODELS_DIR, I18N_YAML_PATH)
+from modules.utils.files_manager import load_yaml
+from modules.whisper.whisper_factory import WhisperFactory
+from modules.translation.nllb_inference import NLLBInference
+from modules.ui.htmls import *
+from modules.utils.cli_manager import str2bool
+from modules.utils.youtube_manager import get_ytmetas
+from modules.translation.deepl_api import DeepLAPI
+from modules.whisper.data_classes import *
 
 
 class Auto:
     def __init__(self, args):
         self.args = args
+        self.whisper_inf = WhisperFactory.create_whisper_inference(
+            whisper_type=WhisperImpl.WHISPER.value,
+            whisper_model_dir=WHISPER_MODELS_DIR,
+            faster_whisper_model_dir=FASTER_WHISPER_MODELS_DIR,
+            insanely_fast_whisper_model_dir=INSANELY_FAST_WHISPER_MODELS_DIR,
+            uvr_model_dir=UVR_MODELS_DIR,
+            output_dir=OUTPUT_DIR,
+        )
+        self.nllb_inf = NLLBInference(
+            model_dir=NLLB_MODELS_DIR,
+            output_dir=os.path.join(OUTPUT_DIR, "translations")
+        )
+        self.deepl_api = DeepLAPI(
+            output_dir=os.path.join(OUTPUT_DIR, "translations")
+        )
+        self.default_params = load_yaml(DEFAULT_PARAMETERS_CONFIG_PATH)
+        print(f"Use \"{self.args.whisper_type}\" implementation\n"
+              f"Device \"{self.whisper_inf.device}\" is detected")
+
         self.whisper_model="large-v3"
-        self.device="cuda"
-        self.compute_type="float16"
         self.NLLB_model="facebook/nllb-200-3.3B"
+        self.device="cuda"
         self.videoLists=None
-        self.whisper_inf=None
-        self.nllb_inf=None
         self.process_info={}
         self.translate_languages={"en":"English","ja":"Japanese","zh_hant":"Chinese (Traditional)","ko":"Korean","vi":"Vietnamese","tha":"Thai","ind":"Indonesian","hi":"Hindi","ar":"Modern Standard Arabic","de":"German","fr":"French","it":"Italian","ru":"Russian","es":"Spanish","zsm":"Standard Malay"}
         #{"en":"English","ja":"Japanese","zh_hant":"Chinese (Traditional)"}
 
-    def Load_whisper(self):
-        if self.whisper_inf==None:
-            self.whisper_inf = ConsoleWhisperInference() if self.args.disable_faster_whisper else ConsoleFasterWhisperInference()
-            if isinstance(self.whisper_inf, ConsoleWhisperInference):
-                print("Use Faster Whisper implementation")
-            else:
-                print("Use Open AI Whisper implementation")
-            print(f"Device \"{self.whisper_inf.device}\" is detected")
-        self.whisper_inf.update_model(self.whisper_model,self.compute_type)
-
-    def Load_NLLB(self):
-        if self.nllb_inf==None:
-            self.nllb_inf = ConsoleNLLBInference()
-        self.nllb_inf.update_model(self.NLLB_model)
+    def progress(self):
+        return
 
     def save_dict_to_txt(self,data, folder_path, file_name):
         """
@@ -107,13 +117,13 @@ class Auto:
             beam_size=1,
             log_prob_threshold=-1,
             no_speech_threshold=0.6,
-            compute_type=self.compute_type,
+            compute_type="float16",
             best_of=5,
             patience=1,
             condition_on_previous_text=False,
             initial_prompt=None
             )
-        return self.whisper_inf.transcribe_file(rootfolder,lanfolder,save_name,file_name,"SRT",False,whisper_params)
+        return self.whisper_inf.transcribe_file_web(rootfolder,lanfolder,save_name,file_name,"SRT",False,self.progress,self.default_params)
 
     def GetAllVideoList(self):
         url = "https://dyhaojiu.jaxczs.cn/api/video/getAllVideoList"
@@ -156,7 +166,7 @@ class Auto:
                         self.process_info[self.whisper_model][lankey]={}
                     if not epidkey in self.process_info[self.whisper_model][lankey] or self.process_info[self.whisper_model][lankey][epidkey]==0:
                         self.process_info[self.whisper_model][lankey][epidkey]=0
-                        if self.nllb_inf.translate_file("subtitle/"+self.whisper_model,lankey,zh_hansfile,self.NLLB_model,"Chinese (Simplified)",lanvalue,False):
+                        if self.nllb_inf.translate_file_web("subtitle/"+self.whisper_model,lankey,zh_hansfile,self.NLLB_model,"Chinese (Simplified)",lanvalue,1000,False,self.progress):
                             self.process_info[self.whisper_model][lankey][epidkey]=1
                         else:
                             print("Translate Failed:Videoid:"+str(vid)+" epid:"+str(epid)+" lan:"+lanvalue)
@@ -165,8 +175,6 @@ class Auto:
           print("API request failed!")
 
     def beginprocess(self):
-        self.Load_whisper();
-        self.Load_NLLB();
         self.process_info=self.load_dict_from_txt('./autoprocess/processinfo.txt')
         self.GetAllVideoList();
 
