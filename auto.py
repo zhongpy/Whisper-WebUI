@@ -112,19 +112,6 @@ class Auto:
 
 
     def TranscribeVideo(self,rootfolder,lanfolder,file_name,save_name):
-        whisper_params=WhisperValues(
-            model_size=self.whisper_model,
-            lang="Automatic Detection",
-            is_translate=False,
-            beam_size=1,
-            log_prob_threshold=-1,
-            no_speech_threshold=0.6,
-            compute_type="float16",
-            best_of=5,
-            patience=1,
-            condition_on_previous_text=False,
-            initial_prompt=None
-            )
         return self.whisper_inf.transcribe_file_web(rootfolder,lanfolder,save_name,file_name,"SRT",False,self.progress,self.default_params)
 
     def GetAllVideoList(self):
