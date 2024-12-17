@@ -167,9 +167,6 @@ class TranslationBase(ABC):
         Files to return to gr.Files()
         """
         try:
-            if fileobjs and isinstance(fileobjs[0], gr.utils.NamedString):
-                fileobjs = [file.name for file in fileobjs]
-
             self.cache_parameters(model_size=model_size,
                                   src_lang=src_lang,
                                   tgt_lang=tgt_lang,
