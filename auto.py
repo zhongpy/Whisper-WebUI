@@ -47,6 +47,49 @@ class Auto:
         self.translate_languages={"en":"English","ja":"Japanese","zh_hant":"Chinese (Traditional)","ko":"Korean","vi":"Vietnamese","tha":"Thai","ind":"Indonesian","hi":"Hindi","ar":"Modern Standard Arabic","de":"German","fr":"French","it":"Italian","ru":"Russian","es":"Spanish","zsm":"Standard Malay"}
         #{"en":"English","ja":"Japanese","zh_hant":"Chinese (Traditional)"}
 
+    def create_pipeline_inputs_console(self):
+        whisper_params = self.default_params["whisper"]
+        vad_params = self.default_params["vad"]
+        diarization_params = self.default_params["diarization"]
+        uvr_params = self.default_params["bgm_separation"]
+
+        # Whisper参数
+        model_size = whisper_params["model_size"]
+        lang = whisper_params["lang"]
+        is_translate = whisper_params["is_translate"]
+        file_format = whisper_params.get("file_format", "SRT")
+        add_timestamp = whisper_params.get("add_timestamp", False)
+
+        # Advanced Whisper 参数
+        advanced_params = {
+            k: v for k, v in whisper_params.items() 
+            if k not in ["model_size", "lang", "is_translate", "file_format", "add_timestamp"]
+        }
+
+        # 背景音乐去除参数
+        bgm_params = uvr_params
+
+        # Voice Detection 参数
+        vad_inputs = vad_params
+
+        # Diarization 参数
+        diarization_inputs = diarization_params
+
+        # 组合所有参数
+        pipeline_inputs = {
+            "whisper": {
+                "model_size": model_size,
+                "lang": lang,
+                "is_translate": is_translate,
+                **advanced_params
+            },
+            "vad": vad_inputs,
+            "diarization": diarization_inputs,
+            "bgm_separation": bgm_params
+        }
+
+        return pipeline_inputs, file_format, add_timestamp
+
     def progress(self,total,desc="",position=None):
         return
 
@@ -112,7 +155,8 @@ class Auto:
 
 
     def TranscribeVideo(self,rootfolder,lanfolder,file_name,save_name):
-        return self.whisper_inf.transcribe_file_web(rootfolder,lanfolder,save_name,file_name,"SRT",False,self.progress,self.default_params)
+        pipeline_inputs, file_format, add_timestamp=self.create_pipeline_inputs_console()
+        return self.whisper_inf.transcribe_file_web(rootfolder,lanfolder,save_name,file_name,file_format,add_timestamp,self.progress,pipeline_inputs)
 
     def GetAllVideoList(self):
         url = "https://dyhaojiu.jaxczs.cn/api/video/getAllVideoList"

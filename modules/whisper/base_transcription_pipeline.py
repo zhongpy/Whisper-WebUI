@@ -299,6 +299,11 @@ class BaseTranscriptionPipeline(ABC):
         #if True:
             file_info = {}
             if True:
+                params = TranscriptionPipelineParams.from_list(list(pipeline_params))
+                writer_options = {
+                    "highlight_words": True if params.whisper.word_timestamps else False
+                }
+
                 transcribed_segments, time_for_task = self.run(
                     file,
                     progress,
@@ -309,9 +314,6 @@ class BaseTranscriptionPipeline(ABC):
 
                 out_dir=output_dir+'/'+lanfolder;
 
-                writer_options = {
-                    "highlight_words": True if params.whisper.word_timestamps else False
-                }
                 subtitle, file_path = self.generate_file(
                     output_dir=out_dir,
                     output_file_name=save_file,
