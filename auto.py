@@ -47,7 +47,7 @@ class Auto:
         self.translate_languages={"en":"English","ja":"Japanese","zh_hant":"Chinese (Traditional)","ko":"Korean","vi":"Vietnamese","tha":"Thai","ind":"Indonesian","hi":"Hindi","ar":"Modern Standard Arabic","de":"German","fr":"French","it":"Italian","ru":"Russian","es":"Spanish","zsm":"Standard Malay"}
         #{"en":"English","ja":"Japanese","zh_hant":"Chinese (Traditional)"}
 
-    def progress(self,*args):
+    def progress(self,total,desc="",position=None):
         return
 
     def save_dict_to_txt(self,data, folder_path, file_name):
