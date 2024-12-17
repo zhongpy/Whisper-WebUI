@@ -182,7 +182,9 @@ class Auto:
 
 # Create the parser for command-line arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('--disable_faster_whisper', type=bool, default=False, nargs='?', const=True, help='Disable the faster_whisper implementation. faster_whipser is implemented by https://github.com/guillaumekln/faster-whisper')
+parser.add_argument('--whisper_type', type=str, default=WhisperImpl.WHISPER.value,
+                    choices=[item.value for item in WhisperImpl],
+                    help='A type of the whisper implementation (Github repo name)')
 _args = parser.parse_args()
 
 if __name__ == "__main__":
