@@ -214,10 +214,10 @@ class TranslationBase(ABC):
 
         except Exception as e:
             print(f"Error translating file: {e}")
-            raise
+            return False
         #finally:
         #    self.release_cuda_memory()
-        return False
+        
 
     def offload(self):
         """Offload the model and free up the memory"""
