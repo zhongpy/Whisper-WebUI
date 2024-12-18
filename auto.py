@@ -119,7 +119,7 @@ class Auto:
             uvr_params.get("enable_offload", True)
         ]
 
-        # 组合所有参数
+        # 组合所有参数为扁平化列表
         pipeline_list = whisper_list + vad_list + diarization_list + bgm_sep_list
 
         file_format = whisper_params.get("file_format", "SRT")
