@@ -15,13 +15,15 @@ from modules.utils.cli_manager import str2bool
 from modules.utils.youtube_manager import get_ytmetas
 from modules.translation.deepl_api import DeepLAPI
 from modules.whisper.data_classes import *
+from modules.utils.constants import *
 
 
 class Auto:
     def __init__(self, args):
         self.args = args
+        self.whisper_type=WhisperImpl.WHISPER.value
         self.whisper_inf = WhisperFactory.create_whisper_inference(
-            whisper_type=WhisperImpl.WHISPER.value,
+            whisper_type=self.whisper_type,
             whisper_model_dir=WHISPER_MODELS_DIR,
             faster_whisper_model_dir=FASTER_WHISPER_MODELS_DIR,
             insanely_fast_whisper_model_dir=INSANELY_FAST_WHISPER_MODELS_DIR,
@@ -51,6 +53,59 @@ class Auto:
     def LoadModel(self):
         self.whisper_inf.update_model(self.whisper_model,self.whisper_inf.current_compute_type,self.progress);
 
+    def whisper_inputs(defaults: Optional[Dict] = None,
+                         only_advanced: Optional[bool] = True):
+        whisper_type = self.whisper_type
+
+        inputs = []
+        if not only_advanced:
+            inputs += [
+                defaults.get("model_size","large-v3"),
+                defaults.get("lang","chinese"),
+                defaults.get("is_translate",False),
+            ]
+
+        inputs += [
+            defaults.get("beam_size",1),
+            defaults.get("log_prob_threshold",-1),
+            defaults.get("no_speech_threshold",0.6),
+            defaults.get("compute_type","float16"),
+            defaults.get("best_of",5),
+            defaults.get("patience",1),
+            defaults.get("condition_on_previous_text",True),
+            defaults.get("prompt_reset_on_temperature",0.5),
+            defaults.get("initial_prompt",GRADIO_NONE_STR),
+            defaults.get("temperature",0),
+            defaults.get("compression_ratio_threshold",2.4),
+        ]
+
+        faster_whisper_inputs = [
+            defaults.get("length_penalty",1),
+            defaults.get("repetition_penalty",1),
+            defaults.get("no_repeat_ngram_size",0),
+            defaults.get("prefix",GRADIO_NONE_STR),
+            defaults.get("suppress_blank",True),
+            defaults.get("suppress_tokens","[-1]"),
+            defaults.get("max_initial_timestamp",1),
+            defaults.get("word_timestamps",False),
+            defaults.get("prepend_punctuations","\"'“¿([{-"),
+            defaults.get("append_punctuations","\"'.。,，!！?？:：”)]}、"),
+            defaults.get("max_new_tokens",GRADIO_NONE_NUMBER_MIN),
+            defaults.get("chunk_length",20),
+            defaults.get("hallucination_silence_threshold",GRADIO_NONE_NUMBER_MIN),
+            defaults.get("hotwords",None),
+            defaults.get("language_detection_threshold",GRADIO_NONE_NUMBER_MIN),
+            defaults.get("language_detection_segments",1),
+        ]
+
+        insanely_fast_whisper_inputs = [
+            defaults.get("batch_size",24),
+        ]
+
+        inputs += faster_whisper_inputs + insanely_fast_whisper_inputs
+
+        return inputs
+
     def create_pipeline_inputs_console(self):
         whisper_params = self.default_params["whisper"]
         vad_params = self.default_params["vad"]
@@ -58,48 +113,16 @@ class Auto:
         uvr_params = self.default_params["bgm_separation"]
 
         # 扁平化 Whisper 参数
-        whisper_list = [
-            whisper_params.get("model_size", "large-v3"),
-            whisper_params.get("lang", "chinese"),
-            whisper_params.get("is_translate", False),
-            whisper_params.get("beam_size", 5),
-            whisper_params.get("log_prob_threshold", -1.0),
-            whisper_params.get("no_speech_threshold", 0.6),
-            whisper_params.get("compute_type", "float16"),
-            whisper_params.get("best_of", 5),
-            whisper_params.get("patience", 1.0),
-            whisper_params.get("condition_on_previous_text", True),
-            whisper_params.get("prompt_reset_on_temperature", 0.5),
-            whisper_params.get("initial_prompt", None),
-            whisper_params.get("temperature", 0.0),
-            whisper_params.get("compression_ratio_threshold", 2.4),
-            whisper_params.get("length_penalty", 1.0),
-            whisper_params.get("repetition_penalty", 1.0),
-            whisper_params.get("no_repeat_ngram_size", 0),
-            whisper_params.get("prefix", None),
-            whisper_params.get("suppress_blank", True),
-            whisper_params.get("suppress_tokens", [-1]),
-            whisper_params.get("max_initial_timestamp", 1.0),
-            whisper_params.get("word_timestamps", False),
-            whisper_params.get("prepend_punctuations", "\"'“¿([{-"),
-            whisper_params.get("append_punctuations", "\"'.。,，!！?？:：”)]}、"),
-            whisper_params.get("max_new_tokens", None),
-            whisper_params.get("chunk_length", 30),
-            whisper_params.get("hallucination_silence_threshold", None),
-            whisper_params.get("hotwords", None),
-            whisper_params.get("language_detection_threshold", None),
-            whisper_params.get("language_detection_segments", 1),
-            whisper_params.get("batch_size", 24)
-        ]
+        whisper_list = self.whisper_inputs(defaults=whisper_params, only_advanced=True)
 
         # 扁平化 VAD 参数
         vad_list = [
             vad_params.get("vad_filter", False),
             vad_params.get("threshold", 0.5),
             vad_params.get("min_speech_duration_ms", 250),
-            vad_params.get("max_speech_duration_s", float("inf")),
-            vad_params.get("min_silence_duration_ms", 2000),
-            vad_params.get("speech_pad_ms", 400)
+            vad_params.get("max_speech_duration_s", 9999),
+            vad_params.get("min_silence_duration_ms", 1000),
+            vad_params.get("speech_pad_ms", 2000)
         ]
 
         # 扁平化 Diarization 参数
@@ -128,7 +151,7 @@ class Auto:
         file_format = whisper_params.get("file_format", "SRT")
         add_timestamp = whisper_params.get("add_timestamp", False)
 
-        return pipeline_inputs, file_format, add_timestamp
+        return (pipeline_inputs, file_format, add_timestamp)
 
 
 
