@@ -148,7 +148,7 @@ class Auto:
 
         pipeline_inputs = [dd_model, dd_lang, cb_translate] + whisper_list + vad_list + diarization_list + bgm_sep_list
 
-        file_format = whisper_params.get("file_format", "SRT")
+        file_format = whisper_params.get("file_format", "WebVTT")
         add_timestamp = whisper_params.get("add_timestamp", False)
 
         return (pipeline_inputs, file_format, add_timestamp)
@@ -247,7 +247,7 @@ class Auto:
                 if epurl=="":
                     continue
                 epidkey=str(epid)
-                zh_hansfile="subtitle/"+self.whisper_model+"/zh_hans/"+str(epid)+".srt"
+                zh_hansfile="subtitle/"+self.whisper_model+"/zh_hans/"+str(epid)+".vtt"
                 if not self.whisper_model in self.process_info:
                     self.process_info[self.whisper_model]={}
                 if not 'zh_hans' in self.process_info[self.whisper_model]:
@@ -259,7 +259,7 @@ class Auto:
                     else:
                         print("Transcribe Failed:Videoid:"+str(vid)+" epid:"+str(epid))
                 for lankey,lanvalue in self.translate_languages.items():
-                    lankey_file="subtitle/"+self.whisper_model+"/"+lankey+"/"+str(epid)+".srt"
+                    lankey_file="subtitle/"+self.whisper_model+"/"+lankey+"/"+str(epid)+".vtt"
                     if not lankey in self.process_info[self.whisper_model]:
                         self.process_info[self.whisper_model][lankey]={}
                     if not epidkey in self.process_info[self.whisper_model][lankey] or self.process_info[self.whisper_model][lankey][epidkey]==0:
