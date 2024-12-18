@@ -119,13 +119,11 @@ class Auto:
             uvr_params.get("enable_offload", True)
         ]
 
-        # 组合所有参数为嵌套结构，以适应 TranscriptionPipelineParams.from_list
-        pipeline_inputs = {
-            "whisper": whisper_list,
-            "vad": vad_list,
-            "diarization": diarization_list,
-            "bgm_separation": bgm_sep_list
-        }
+        dd_model = whisper_params["model_size"]
+        dd_lang = whisper_params["lang"]
+        cb_translate = whisper_params["is_translate"]
+
+        pipeline_inputs = [dd_model, dd_lang, cb_translate] + whisper_list + vad_list + diarization_list + bgm_sep_list
 
         file_format = whisper_params.get("file_format", "SRT")
         add_timestamp = whisper_params.get("add_timestamp", False)
