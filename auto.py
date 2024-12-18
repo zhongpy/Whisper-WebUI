@@ -229,7 +229,7 @@ class Auto:
         # 调用 from_list 时打印输入
         params = TranscriptionPipelineParams.from_list(pipeline_inputs)
         print("[DEBUG] TranscriptionPipelineParams parsed successfully.")
-        return self.whisper_inf.transcribe_file_web(rootfolder,lanfolder,save_name,file_name,file_format,add_timestamp,self.progress,pipeline_inputs)
+        return self.whisper_inf.transcribe_file_web(rootfolder,lanfolder,save_name,file_name,file_format,add_timestamp,self.progress,*pipeline_inputs)
 
     def GetAllVideoList(self):
         url = "https://dyhaojiu.jaxczs.cn/api/video/getAllVideoList"
