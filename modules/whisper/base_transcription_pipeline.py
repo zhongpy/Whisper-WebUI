@@ -314,7 +314,7 @@ class BaseTranscriptionPipeline(ABC):
 
                 out_dir=rootfolder+'/'+lanfolder;
 
-                subtitle, file_path = self.generate_file(
+                subtitle, file_path = generate_file(
                     output_dir=out_dir,
                     output_file_name=save_file,
                     output_format=file_format,
