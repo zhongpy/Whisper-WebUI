@@ -200,7 +200,7 @@ class Auto:
         if response.status_code == 200:
             # Get the data in JSON format
             self.videoLists = response.json()
-            print(self.videoLists)
+            #print(self.videoLists)
             for videoinfo in self.videoLists:
                 self.GetVideoEpisodes(videoinfo['id'])
         else:
