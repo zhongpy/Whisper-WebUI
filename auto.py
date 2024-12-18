@@ -46,6 +46,10 @@ class Auto:
         self.process_info={}
         self.translate_languages={"en":"English","ja":"Japanese","zh_hant":"Chinese (Traditional)","ko":"Korean","vi":"Vietnamese","tha":"Thai","ind":"Indonesian","hi":"Hindi","ar":"Modern Standard Arabic","de":"German","fr":"French","it":"Italian","ru":"Russian","es":"Spanish","zsm":"Standard Malay"}
         #{"en":"English","ja":"Japanese","zh_hant":"Chinese (Traditional)"}
+        self.LoadModel();
+
+    def LoadModel(self):
+        self.whisper_inf.update_model(self.whisper_model,self.whisper_inf.current_compute_type,self.progress);
 
     def create_pipeline_inputs_console(self):
         whisper_params = self.default_params["whisper"]
@@ -81,6 +85,7 @@ class Auto:
                 "model_size": model_size,
                 "lang": lang,
                 "is_translate": is_translate,
+                "compute_type":this.whisper_inf.current_compute_type,
                 **advanced_params
             },
             "vad": vad_inputs,
