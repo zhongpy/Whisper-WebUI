@@ -85,7 +85,7 @@ class Auto:
                 "model_size": model_size,
                 "lang": lang,
                 "is_translate": is_translate,
-                "compute_type":this.whisper_inf.current_compute_type,
+                "compute_type":self.whisper_inf.current_compute_type,
                 **advanced_params
             },
             "vad": vad_inputs,
