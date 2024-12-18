@@ -59,7 +59,7 @@ class Auto:
 
         # 扁平化 Whisper 参数
         whisper_list = [
-            whisper_params.get("model_size", "large-v2"),
+            whisper_params.get("model_size", "large-v3"),
             whisper_params.get("lang", None),
             whisper_params.get("is_translate", False),
             whisper_params.get("beam_size", 5),
@@ -119,12 +119,14 @@ class Auto:
             uvr_params.get("enable_offload", True)
         ]
 
+        # 组合所有参数
         pipeline_list = whisper_list + vad_list + diarization_list + bgm_sep_list
 
         file_format = whisper_params.get("file_format", "SRT")
         add_timestamp = whisper_params.get("add_timestamp", False)
 
         return pipeline_list, file_format, add_timestamp
+
 
     def progress(self,total,desc="",position=None):
         return
@@ -192,6 +194,14 @@ class Auto:
 
     def TranscribeVideo(self,rootfolder,lanfolder,file_name,save_name):
         pipeline_inputs, file_format, add_timestamp=self.create_pipeline_inputs_console()
+        print("[DEBUG] Pipeline List:")
+        print(pipeline_inputs)
+        print("[DEBUG] File Format:", file_format)
+        print("[DEBUG] Add Timestamp:", add_timestamp)
+
+        # 调用 from_list 时打印输入
+        params = TranscriptionPipelineParams.from_list(pipeline_inputs)
+        print("[DEBUG] TranscriptionPipelineParams parsed successfully.")
         return self.whisper_inf.transcribe_file_web(rootfolder,lanfolder,save_name,file_name,file_format,add_timestamp,self.progress,pipeline_inputs)
 
     def GetAllVideoList(self):
