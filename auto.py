@@ -221,14 +221,6 @@ class Auto:
 
     def TranscribeVideo(self,rootfolder,lanfolder,file_name,save_name):
         pipeline_inputs, file_format, add_timestamp=self.create_pipeline_inputs_console()
-        print("[DEBUG] Pipeline List:")
-        print(pipeline_inputs)
-        print("[DEBUG] File Format:", file_format)
-        print("[DEBUG] Add Timestamp:", add_timestamp)
-
-        # 调用 from_list 时打印输入
-        params = TranscriptionPipelineParams.from_list(pipeline_inputs)
-        print("[DEBUG] TranscriptionPipelineParams parsed successfully.")
         return self.whisper_inf.transcribe_file_web(rootfolder,lanfolder,save_name,file_name,file_format,add_timestamp,self.progress,*pipeline_inputs)
 
     def GetAllVideoList(self):

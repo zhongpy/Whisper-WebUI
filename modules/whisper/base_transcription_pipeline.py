@@ -312,7 +312,7 @@ class BaseTranscriptionPipeline(ABC):
                     *pipeline_params,
                 )
 
-                out_dir=output_dir+'/'+lanfolder;
+                out_dir=rootfolder+'/'+lanfolder;
 
                 subtitle, file_path = self.generate_file(
                     output_dir=out_dir,
