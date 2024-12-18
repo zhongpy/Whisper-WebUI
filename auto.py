@@ -53,7 +53,7 @@ class Auto:
     def LoadModel(self):
         self.whisper_inf.update_model(self.whisper_model,self.whisper_inf.current_compute_type,self.progress);
 
-    def whisper_inputs(defaults: Optional[Dict] = None,
+    def whisper_inputs(self,defaults: Optional[Dict] = None,
                          only_advanced: Optional[bool] = True):
         whisper_type = self.whisper_type
 
