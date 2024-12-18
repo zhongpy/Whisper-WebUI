@@ -185,7 +185,7 @@ class Auto:
             with open(file_path, "w") as f:
                 f.write(data_str)
 
-            print(f"字典已保存到 {file_path}")
+            #print(f"字典已保存到 {file_path}")
             return True
         except Exception as e:
             print(f"保存失败：{e}")
@@ -271,6 +271,7 @@ class Auto:
                 self.save_dict_to_txt(self.process_info,"autoprocess","processinfo.txt")
         else:
           print("API request failed!")
+        print("\nWork Over!!!")
 
     def beginprocess(self):
         self.process_info=self.load_dict_from_txt('./autoprocess/processinfo.txt')
