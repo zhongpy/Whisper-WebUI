@@ -80,6 +80,10 @@ class BaseParams(BaseModel):
     @classmethod
     def from_list(cls, data_list: List) -> 'BaseParams':
         field_names = list(cls.model_fields.keys())
+        print("[DEBUG] Data list for WhisperParams:", data_list)
+        print("[DEBUG] Expected fields:", field_names)
+        if len(data_list) != len(field_names):
+            raise ValueError(f"Mismatch in data list length. Expected {len(field_names)}, got {len(data_list)}.")
         return cls(**dict(zip(field_names, data_list)))
 
 
