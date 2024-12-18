@@ -57,43 +57,74 @@ class Auto:
         diarization_params = self.default_params["diarization"]
         uvr_params = self.default_params["bgm_separation"]
 
-        # Whisper参数
-        model_size = whisper_params["model_size"]
-        lang = whisper_params["lang"]
-        is_translate = whisper_params["is_translate"]
+        # 扁平化 Whisper 参数
+        whisper_list = [
+            whisper_params.get("model_size", "large-v2"),
+            whisper_params.get("lang", None),
+            whisper_params.get("is_translate", False),
+            whisper_params.get("beam_size", 5),
+            whisper_params.get("log_prob_threshold", -1.0),
+            whisper_params.get("no_speech_threshold", 0.6),
+            whisper_params.get("compute_type", "float16"),
+            whisper_params.get("best_of", 5),
+            whisper_params.get("patience", 1.0),
+            whisper_params.get("condition_on_previous_text", True),
+            whisper_params.get("prompt_reset_on_temperature", 0.5),
+            whisper_params.get("initial_prompt", None),
+            whisper_params.get("temperature", 0.0),
+            whisper_params.get("compression_ratio_threshold", 2.4),
+            whisper_params.get("length_penalty", 1.0),
+            whisper_params.get("repetition_penalty", 1.0),
+            whisper_params.get("no_repeat_ngram_size", 0),
+            whisper_params.get("prefix", None),
+            whisper_params.get("suppress_blank", True),
+            whisper_params.get("suppress_tokens", [-1]),
+            whisper_params.get("max_initial_timestamp", 1.0),
+            whisper_params.get("word_timestamps", False),
+            whisper_params.get("prepend_punctuations", "\"'“¿([{-"),
+            whisper_params.get("append_punctuations", "\"'.。,，!！?？:：”)]}、"),
+            whisper_params.get("max_new_tokens", None),
+            whisper_params.get("chunk_length", 30),
+            whisper_params.get("hallucination_silence_threshold", None),
+            whisper_params.get("hotwords", None),
+            whisper_params.get("language_detection_threshold", None),
+            whisper_params.get("language_detection_segments", 1),
+            whisper_params.get("batch_size", 24)
+        ]
+
+        # 扁平化 VAD 参数
+        vad_list = [
+            vad_params.get("vad_filter", False),
+            vad_params.get("threshold", 0.5),
+            vad_params.get("min_speech_duration_ms", 250),
+            vad_params.get("max_speech_duration_s", float("inf")),
+            vad_params.get("min_silence_duration_ms", 2000),
+            vad_params.get("speech_pad_ms", 400)
+        ]
+
+        # 扁平化 Diarization 参数
+        diarization_list = [
+            diarization_params.get("is_diarize", False),
+            diarization_params.get("device", "cuda"),
+            diarization_params.get("hf_token", "")
+        ]
+
+        # 扁平化 BGM Separation 参数
+        bgm_sep_list = [
+            uvr_params.get("is_separate_bgm", False),
+            uvr_params.get("model_size", "UVR-MDX-NET-Inst_HQ_4"),
+            uvr_params.get("device", "cuda"),
+            uvr_params.get("segment_size", 256),
+            uvr_params.get("save_file", False),
+            uvr_params.get("enable_offload", True)
+        ]
+
+        pipeline_list = whisper_list + vad_list + diarization_list + bgm_sep_list
+
         file_format = whisper_params.get("file_format", "SRT")
         add_timestamp = whisper_params.get("add_timestamp", False)
 
-        # Advanced Whisper 参数
-        advanced_params = {
-            k: v for k, v in whisper_params.items() 
-            if k not in ["model_size", "lang", "is_translate", "file_format", "add_timestamp"]
-        }
-
-        # 背景音乐去除参数
-        bgm_params = uvr_params
-
-        # Voice Detection 参数
-        vad_inputs = vad_params
-
-        # Diarization 参数
-        diarization_inputs = diarization_params
-
-        # 组合所有参数
-        pipeline_inputs = {
-            "whisper": {
-                "model_size": model_size,
-                "lang": lang,
-                "is_translate": is_translate,
-                "compute_type":self.whisper_inf.current_compute_type,
-                **advanced_params
-            },
-            "vad": vad_inputs,
-            "diarization": diarization_inputs,
-            "bgm_separation": bgm_params
-        }
-
-        return pipeline_inputs, file_format, add_timestamp
+        return pipeline_list, file_format, add_timestamp
 
     def progress(self,total,desc="",position=None):
         return
