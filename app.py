@@ -21,7 +21,6 @@ class App:
     def __init__(self, args):
         self.args = args
         self.app = gr.Blocks(css=CSS, theme=self.args.theme, delete_cache=(60, 3600))
-        self.i18n = Translate(I18N_YAML_PATH)
         self.whisper_inf = WhisperFactory.create_whisper_inference(
             whisper_type=self.args.whisper_type,
             whisper_model_dir=self.args.whisper_model_dir,
@@ -37,6 +36,7 @@ class App:
         self.deepl_api = DeepLAPI(
             output_dir=os.path.join(self.args.output_dir, "translations")
         )
+        self.i18n = load_yaml(I18N_YAML_PATH)
         self.default_params = load_yaml(DEFAULT_PARAMETERS_CONFIG_PATH)
         print(f"Use \"{self.args.whisper_type}\" implementation\n"
               f"Device \"{self.whisper_inf.device}\" is detected")
@@ -82,8 +82,6 @@ class App:
                                                                     available_devices=self.whisper_inf.diarizer.available_device,
                                                                     device=self.whisper_inf.diarizer.device)
 
-        dd_model.change(fn=self.on_change_models, inputs=[dd_model], outputs=[cb_translate])
-
         pipeline_inputs = [dd_model, dd_lang, cb_translate] + whisper_inputs + vad_inputs + diarization_inputs + uvr_inputs
 
         return (
@@ -99,7 +97,11 @@ class App:
         uvr_params = self.default_params["bgm_separation"]
 
         with self.app:
-            with self.i18n:
+            lang = gr.Radio(choices=list(self.i18n.keys()),
+                            label=_("Language"), interactive=True,
+                            visible=False,  # Set it by development purpose.
+                            )
+            with Translate(I18N_YAML_PATH):
                 with gr.Row():
                     with gr.Column():
                         gr.Markdown(MARKDOWN, elem_id="md_project")
@@ -255,7 +257,7 @@ class App:
                         files_audio = gr.Files(type="filepath", label=_("Upload Audio Files to separate background music"))
                         dd_uvr_device = gr.Dropdown(label=_("Device"), value=self.whisper_inf.music_separator.device,
                                                     choices=self.whisper_inf.music_separator.available_devices)
-                        dd_uvr_model_size = gr.Dropdown(label=_("Model"), value=uvr_params["model_size"],
+                        dd_uvr_model_size = gr.Dropdown(label=_("Model"), value=uvr_params["uvr_model_size"],
                                                         choices=self.whisper_inf.music_separator.available_models)
                         nb_uvr_segment_size = gr.Number(label="Segment Size", value=uvr_params["segment_size"],
                                                         precision=0)
@@ -299,7 +301,8 @@ class App:
             ssl_verify=args.ssl_verify,
             ssl_keyfile=args.ssl_keyfile,
             ssl_keyfile_password=args.ssl_keyfile_password,
-            ssl_certfile=args.ssl_certfile
+            ssl_certfile=args.ssl_certfile,
+            allowed_paths=eval(args.allowed_paths) if args.allowed_paths else None
         )
 
     @staticmethod
@@ -309,14 +312,6 @@ class App:
         else:
             os.makedirs(folder_path, exist_ok=True)
             print(f"The directory path {folder_path} has newly created.")
-
-    @staticmethod
-    def on_change_models(model_size: str):
-        translatable_model = ["large", "large-v1", "large-v2", "large-v3"]
-        if model_size not in translatable_model:
-            return gr.Checkbox(visible=False, value=False, interactive=False)
-        else:
-            return gr.Checkbox(visible=True, value=False, label="Translate to English?", interactive=True)
 
 
 parser = argparse.ArgumentParser()
@@ -333,6 +328,7 @@ parser.add_argument('--theme', type=str, default=None, help='Gradio Blocks theme
 parser.add_argument('--colab', type=str2bool, default=False, nargs='?', const=True, help='Is colab user or not')
 parser.add_argument('--api_open', type=str2bool, default=False, nargs='?', const=True,
                     help='Enable api or not in Gradio')
+parser.add_argument('--allowed_paths', type=str, default=None, help='Gradio allowed paths')
 parser.add_argument('--inbrowser', type=str2bool, default=True, nargs='?', const=True,
                     help='Whether to automatically start Gradio app or not')
 parser.add_argument('--ssl_verify', type=str2bool, default=True, nargs='?', const=True,

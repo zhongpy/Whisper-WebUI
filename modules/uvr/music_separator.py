@@ -9,14 +9,15 @@ import gradio as gr
 from datetime import datetime
 
 from uvr.models import MDX, Demucs, VrNetwork, MDXC
-from modules.utils.paths import DEFAULT_PARAMETERS_CONFIG_PATH
+from modules.utils.paths import DEFAULT_PARAMETERS_CONFIG_PATH, UVR_MODELS_DIR, UVR_OUTPUT_DIR
 from modules.utils.files_manager import load_yaml, save_yaml, is_video
 from modules.diarize.audio_loader import load_audio
 
+
 class MusicSeparator:
     def __init__(self,
-                 model_dir: Optional[str] = None,
-                 output_dir: Optional[str] = None):
+                 model_dir: Optional[str] = UVR_MODELS_DIR,
+                 output_dir: Optional[str] = UVR_OUTPUT_DIR):
         self.model = None
         self.device = self.get_device()
         self.available_devices = ["cpu", "cuda"]
@@ -118,7 +119,8 @@ class MusicSeparator:
             )
             self.model.sample_rate = sample_rate
 
-        progress(0, desc="Separating background music from the audio..")
+        progress(0, desc="Separating background music from the audio.. "
+                         "(It will only display 0% until the job is complete.) ")
         result = self.model(audio)
         instrumental, vocals = result["instrumental"].T, result["vocals"].T
 

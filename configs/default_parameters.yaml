@@ -28,7 +28,7 @@ whisper:
   max_new_tokens: null
   hallucination_silence_threshold: null
   hotwords: null
-  language_detection_threshold: null
+  language_detection_threshold: 0.5
   language_detection_segments: 1
   add_timestamp: false
 
@@ -46,7 +46,7 @@ diarization:
 
 bgm_separation:
   is_separate_bgm: false
-  model_size: "UVR-MDX-NET-Inst_HQ_4"
+  uvr_model_size: "UVR-MDX-NET-Inst_HQ_4"
   segment_size: 256
   save_file: false
   enable_offload: true

@@ -46,7 +46,6 @@ class BaseTranscriptionPipeline(ABC):
         self.current_model_size = None
         self.available_models = whisper.available_models()
         self.available_langs = sorted(list(whisper.tokenizer.LANGUAGES.values()))
-        self.translatable_models = ["large", "large-v1", "large-v2", "large-v3"]
         self.device = self.get_device()
         self.available_compute_types = self.get_available_compute_type()
         self.current_compute_type = self.get_compute_type()
@@ -111,8 +110,8 @@ class BaseTranscriptionPipeline(ABC):
         if bgm_params.is_separate_bgm:
             music, audio, _ = self.music_separator.separate(
                 audio=audio,
-                model_name=bgm_params.model_size,
-                device=bgm_params.device,
+                model_name=bgm_params.uvr_model_size,
+                device=bgm_params.uvr_device,
                 segment_size=bgm_params.segment_size,
                 save_file=bgm_params.save_file,
                 progress=progress
@@ -160,13 +159,15 @@ class BaseTranscriptionPipeline(ABC):
                 segments=result,
                 speech_chunks=speech_chunks,
             )
+            if not result:
+                raise ValueError("VAD detected no speech segments in the audio.")
 
         if diarization_params.is_diarize:
             result, elapsed_time_diarization = self.diarizer.run(
                 audio=audio,
                 use_auth_token=diarization_params.hf_token,
                 transcribed_result=result,
-                device=diarization_params.device
+                device=diarization_params.diarization_device
             )
             elapsed_time += elapsed_time_diarization
 
